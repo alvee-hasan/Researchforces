@@ -70,7 +70,7 @@ else if (isset($_POST['lgsubmit'])) {
           <p class="social-text">Or Sign in with social platform</p>
           <div class="social-media">
             <a href="#" class="social-icon">
-              <i class="fab fa-facebook-f"></i> <!--Waiting to be updated....-->
+              <i class="fab fa-facebook-f"></i> <!--Waiting to be updated....Have to update-->
             </a>
             <a href="#" class="social-icon">
               <i class="fab fa-twitter"></i>
