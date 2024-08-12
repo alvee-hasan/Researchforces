@@ -1,0 +1,12 @@
+foreach ($_FILES['files']['tmp_name'] as $i => $tmp_name) {
+            if ($_FILES['files']['type'][$i] == 'text/plain') { // Ensure it's a text file
+                $name = $_FILES['files']['name'][$i];
+                move_uploaded_file($tmp_name, $foldername . "/" . $name);
+
+                 //Insert information about the uploaded text file into the text_files table
+                $file_path = $foldername . "/" . $name;
+                $annotation_id = mysqli_insert_id($conn); // Get the last inserted annotation ID
+                $txt_insert_sql = "INSERT INTO text_files (name, file_path, annotation_id) VALUES ('$name', '$file_path', $annotation_id)";
+                mysqli_query($conn, $txt_insert_sql);
+            }
+        }

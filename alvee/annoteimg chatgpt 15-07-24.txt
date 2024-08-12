@@ -1,0 +1,159 @@
+<?php
+session_start();
+@include 'config.php';
+
+// Retrieve session variables
+$option1 = $_SESSION['opt1'];
+$option2 = $_SESSION['opt2'];
+$rid = $_SESSION['id'];
+$dop = $_SESSION['dop'];
+$resc = $_SESSION['resc'];
+$username = $_SESSION['username'];
+
+// Increment user points by 20
+$sql = "SELECT * FROM user WHERE username='$username'";
+$res = mysqli_query($conn, $sql);
+if ($res) {
+    $row = mysqli_fetch_assoc($res);
+    $pts = $row['point'];
+    $pts += 20; // Increment points
+    $qry = "UPDATE user SET point='$pts' WHERE username='$username'";
+    mysqli_query($conn, $qry);
+}
+
+// Retrieve image files for annotation
+$sql = "SELECT * FROM imagecollection WHERE rid='$rid' ORDER BY count ASC";
+$res = mysqli_query($conn, $sql);
+$imageFiles = [];
+if ($res) {
+    while ($row = mysqli_fetch_assoc($res)) {
+        $imageFiles[] = $row['imgid']; // Assuming 'imgid' is the image identifier column
+}}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo $rid; ?> | ResearchForces</title>
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            background-image: url('img/bg111.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        img {
+            width: 700px;
+            height: 500px;
+        }
+        p {
+            display: none;
+            color: #ffffff;
+        }
+        input {
+            color: #ffffff;
+        }
+        label {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div id="imageContainer">
+        <img id="currentImage" src="" alt="Image">
+    </div>
+    <form action="" id="optionsForm">
+        <input type="radio" name="options" value="<?php echo $option1; ?>" id="option1"> <label for="option1"><?php echo $option1; ?></label>
+        <input type="radio" name="options" value="<?php echo $option2; ?>" id="option2"> <label for="option2"><?php echo $option2; ?></label>
+        <br>
+        <button type="button" id="nextButton">Next</button>
+        <button type="button" id="skipButton">Skip</button>
+    </form>
+
+    <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
+
+    <script>
+        const imageFiles = <?php echo json_encode($imageFiles); ?>;
+        let currentImageIndex = 0;
+
+        function showImage() {
+            const imageContainer = document.getElementById('currentImage');
+            imageContainer.src = 'Annotefiles/<?php echo $dop; ?>/' + imageFiles[currentImageIndex] + '.jpg'; // Adjust file extension as needed
+        }
+
+        function onNextClick() {
+            const selectedOption = document.querySelector('input[name="options"]:checked');
+            if (!selectedOption) {
+                alert('Please select an option.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('imgid', imageFiles[currentImageIndex]);
+            formData.append('option', selectedOption.value);
+            formData.append('rid', '<?php echo $rid; ?>');
+
+            // Send data to process.php to handle CSV creation
+            fetch('process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data); // Output any response from the PHP script (optional)
+            })
+            .catch(error => {
+                console.error('Error sending data to PHP:', error);
+            });
+
+            // Increment index to show next image
+            currentImageIndex++;
+
+            if (currentImageIndex < imageFiles.length) {
+                showImage();
+                resetOptions();
+            } else {
+                // Hide elements and show final message
+                document.getElementById('imageContainer').style.display = 'none';
+                document.getElementById('optionsForm').style.display = 'none';
+                document.getElementById('nextButton').style.display = 'none';
+                document.getElementById('skipButton').style.display = 'none';
+                document.getElementById('final').style.display = 'block';
+                alert('Your response has been recorded. Thanks a lot for collaboration.');
+            }
+        }
+
+        function onSkipClick() {
+            // Increment index to skip to the next image
+            currentImageIndex++;
+
+            if (currentImageIndex < imageFiles.length) {
+                showImage();
+                resetOptions();
+            } else {
+                // Hide elements and show final message
+                document.getElementById('imageContainer').style.display = 'none';
+                document.getElementById('optionsForm').style.display = 'none';
+                document.getElementById('nextButton').style.display = 'none';
+                document.getElementById('skipButton').style.display = 'none';
+                document.getElementById('final').style.display = 'block';
+                alert('Your response has been recorded. Thanks a lot for collaboration.');
+            }
+        }
+
+        function resetOptions() {
+            const selectedOption = document.querySelector('input[name="options"]:checked');
+            if (selectedOption) {
+                selectedOption.checked = false;
+            }
+        }
+
+        // Attach event listeners to buttons
+        document.getElementById('nextButton').addEventListener('click', onNextClick);
+        document.getElementById('skipButton').addEventListener('click', onSkipClick);
+
+        // Display the first image on page load
+        showImage();
+    </script>
+</body>
+</html>

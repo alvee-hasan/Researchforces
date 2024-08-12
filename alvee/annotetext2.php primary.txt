@@ -1,0 +1,183 @@
+<?php
+session_start();
+@include 'config.php';
+
+$username = $_SESSION['username'];
+$rid = $_SESSION['id'];
+$dop = $_SESSION['dop'];
+
+$sql = "SELECT * FROM user WHERE username='$username'";
+$res = mysqli_query($conn, $sql);
+if ($res) {
+    $row = mysqli_fetch_assoc($res);
+    $pts = $row['point'];
+}
+
+$csvFilePath = "Textannotation/$dop/data.csv";
+$csvData = array_map('str_getcsv', file($csvFilePath));
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $lineIndex = $_POST['lineIndex'];
+    $annotation = $_POST['annotation'];
+    $annotator = $username;
+
+    // Add annotation and annotator name to the CSV data
+    $csvData[$lineIndex][] = $annotation;
+    $csvData[$lineIndex][] = $annotator;
+
+    // Save the updated CSV data back to the file
+    $fp = fopen($csvFilePath, 'w');
+    foreach ($csvData as $fields) {
+        fputcsv($fp, $fields);
+    }
+    fclose($fp);
+
+    // Update resource count and user points
+    $resc = $_SESSION['resc'] + 1;
+    $pts += 20;
+
+    $sql = "UPDATE resource SET rescount='$resc' WHERE rid='$rid'";
+    mysqli_query($conn, $sql);
+
+    $qry = "UPDATE user SET point='$pts' WHERE username='$username'";
+    mysqli_query($conn, $qry);
+
+    header('Location: annotetext2.php'); // Redirect to annotetext2.php after processing
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo $rid; ?> | ResearchForces</title>
+    <style>
+        body {
+            background-image: url('img/bg111.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        input[type="text"] {
+            color: #ffffff;
+            background-color: transparent;
+            border: none;
+            border-bottom: 1px solid #ffffff;
+            outline: none;
+        }
+
+        p {
+            display: none;
+            color: #ffffff;
+        }
+
+        label {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div id="textFieldContainer">
+        <textarea id="textField" rows="4" cols="50" readonly></textarea>
+    </div>
+    <form id="annotationForm" method="POST" action="annotetext2.php">
+        <input type="hidden" name="lineIndex" id="lineIndex">
+        <input type="radio" name="annotation" value="<?php echo $_SESSION['opt1']; ?>" id="option1"> <label for="option1"><?php echo $_SESSION['opt1']; ?></label><br>
+        <input type="radio" name="annotation" value="<?php echo $_SESSION['opt2']; ?>" id="option2"> <label for="option2"><?php echo $_SESSION['opt2']; ?></label><br>
+        <button type="button" id="nextButton">Next</button>
+    </form>
+    <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
+
+    <script>
+    let csvData = <?php echo json_encode($csvData); ?>;
+    let currentLineIndex = 0;
+
+    function showLine() {
+        const textField = document.getElementById('textField');
+        if (csvData[currentLineIndex]) {
+            textField.value = csvData[currentLineIndex][0]; // Update text area with the text from csvData
+            document.getElementById('lineIndex').value = currentLineIndex;
+        } else {
+            console.error('No data found for current line index:', currentLineIndex);
+        }
+    }
+
+    function onNextClick() {
+        const selectedOption = document.querySelector('input[name="annotation"]:checked');
+        if (!selectedOption) {
+            alert('Please select an option.');
+            return;
+        }
+
+        // Update the CSV data array with annotation and annotator
+        const annotation = selectedOption.value;
+        const annotator = "<?php echo $username; ?>"; // Assuming $username is defined in PHP
+
+        // Ensure csvData[currentLineIndex] is initialized as an array if it's not already
+        if (!Array.isArray(csvData[currentLineIndex])) {
+            csvData[currentLineIndex] = [csvData[currentLineIndex][0]]; // Preserve existing text data
+        }
+
+        // Push annotation and annotator to csvData
+        csvData[currentLineIndex].push(annotation, annotator);
+
+        // Increment current line index
+        currentLineIndex++;
+
+        // Check if there are more lines to display
+        if (currentLineIndex < csvData.length) {
+            showLine(); // Display the next line
+            resetOptions(); // Clear radio button selection
+        } else {
+            // Hide elements and show final message if all lines are processed
+            document.getElementById('textFieldContainer').style.display = 'none';
+            document.getElementById('annotationForm').style.display = 'none';
+            document.getElementById('nextButton').style.display = 'none';
+            document.getElementById('final').style.display = 'block';
+            alert('Your response has been recorded. Thanks a lot for collaboration.');
+        }
+
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Optionally, submit the form via AJAX to avoid page reload
+        submitForm();
+    }
+
+    function resetOptions() {
+        const selectedOption = document.querySelector('input[name="annotation"]:checked');
+        if (selectedOption) {
+            selectedOption.checked = false;
+        }
+    }
+
+    function submitForm() {
+        // Optionally, submit the form via AJAX
+        const form = document.getElementById('annotationForm');
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // Handle response as needed (if any)
+        })
+        .catch(error => {
+            console.error('Error during form submission:', error);
+        });
+    }
+
+    document.getElementById('nextButton').addEventListener('click', onNextClick);
+
+    // Initial function call to show the first line
+    showLine();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<script>
+    let csvData = <?php echo json_encode($csvData); ?>;
+    let currentLineIndex = 0;
+
+    function showLine() {
+        const textField = document.getElementById('textField');
+        if (csvData[currentLineIndex]) {
+            textField.value = csvData[currentLineIndex][0]; // Update text area with the text from csvData
+            document.getElementById('lineIndex').value = currentLineIndex;
+        } else {
+            console.error('No data found for current line index:', currentLineIndex);
+        }
+    }
+
+    function onNextClick() {
+    const selectedOption = document.querySelector('input[name="annotation"]:checked');
+    if (!selectedOption) {
+        alert('Please select an option.');
+        return;
+    }
+
+    // Update the CSV data array with annotation and annotator
+    const annotation = selectedOption.value;
+    const annotator = "<?php echo $username; ?>"; // Assuming $username is defined in PHP
+
+    // Ensure csvData[currentLineIndex] is initialized as an array if it's not already
+    if (!Array.isArray(csvData[currentLineIndex])) {
+        csvData[currentLineIndex] = [csvData[currentLineIndex][0]]; // Preserve existing text data
+    }
+
+    // Push annotation and annotator to csvData
+    csvData[currentLineIndex].push(annotation, annotator);
+
+    // Increment current line index
+    currentLineIndex++;
+
+    // Check if there are more lines to display
+    if (currentLineIndex < csvData.length) {
+        showLine(); // Display the next line
+        resetOptions(); // Clear radio button selection
+    } else {
+        // Hide elements and show final message if all lines are processed
+        document.getElementById('textFieldContainer').style.display = 'none';
+        document.getElementById('annotationForm').style.display = 'none';
+        document.getElementById('nextButton').style.display = 'none';
+        document.getElementById('final').style.display = 'block';
+        alert('Your response has been recorded. Thanks a lot for collaboration.');
+        return; // Exit function to prevent further execution
+    }
+
+    // Prevent default form submission
+    event.preventDefault();
+
+    // Optionally, submit the form via AJAX to avoid page reload
+    submitForm();
+}
+
+    function resetOptions() {
+        const selectedOption = document.querySelector('input[name="annotation"]:checked');
+        if (selectedOption) {
+            selectedOption.checked = false;
+        }
+    }
+
+    function submitForm() {
+        // Optionally, submit the form via AJAX
+        const form = document.getElementById('annotationForm');
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // Handle response as needed (if any)
+        })
+        .catch(error => {
+            console.error('Error during form submission:', error);
+        });
+    }
+
+    document.getElementById('nextButton').addEventListener('click', onNextClick);
+
+    // Initial function call to show the first line
+    showLine();
+</script>
