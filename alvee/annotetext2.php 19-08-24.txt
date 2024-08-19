@@ -77,10 +77,9 @@ $currentTextIndex = 0; // Initialize currentTextIndex
         <input type="radio" name="options" value="<?php echo $option2; ?>" id="option2"> <label for="option2"><?php echo $option2; ?></label><br>
         <button type="button" id="nextButton">Next</button>
         <button type="button" id="skipButton">Skip</button> <!-- Add Skip Button -->
-        <button type="button" id="finishButton">Finish Here</button> <!-- Add Finish Here Button -->
     </form>
     <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
-
+        <!--Added New-->
     <?php 
     @include 'config.php' ;
     $resc = $resc + 1 ;
@@ -88,7 +87,7 @@ $currentTextIndex = 0; // Initialize currentTextIndex
     mysqli_query($conn, $sql) ;
     $qry = "UPDATE requests SET status='finished' WHERE rid='$rid' and username='$username'" ;
     mysqli_query($conn, $qry) ;
-    ?>
+  ?>
 
     <script>
         let texts = <?php echo json_encode($texts); ?>;
@@ -165,35 +164,11 @@ $currentTextIndex = 0; // Initialize currentTextIndex
             }
         }
 
-        function onFinishClick() {
-            const formData = new FormData();
-            for (let i = currentTextIndex; i < texts.length; i++) {
-                formData.append('lineIndex', i);
-                formData.append('options', '-'); // Default option for skipped texts
-                formData.append('lineIdentifier', texts[i].tid); // Use tid here
-
-                fetch('processtext.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data); // Check if "ok" is logged
-                })
-                .catch(error => {
-                    console.error('Error sending data to PHP:', error);
-                });
-            }
-
-            finishAnnotation();
-        }
-
         function finishAnnotation() {
             document.getElementById('textFieldContainer').style.display = 'none';
             document.getElementById('optionsForm').style.display = 'none';
             document.getElementById('nextButton').style.display = 'none';
             document.getElementById('skipButton').style.display = 'none';
-            document.getElementById('finishButton').style.display = 'none';
             document.getElementById('final').style.display = 'block';
             alert('Your response has been recorded. Thanks a lot for collaboration.');
         }
@@ -207,7 +182,6 @@ $currentTextIndex = 0; // Initialize currentTextIndex
 
         document.getElementById('nextButton').addEventListener('click', onNextClick);
         document.getElementById('skipButton').addEventListener('click', onSkipClick);
-        document.getElementById('finishButton').addEventListener('click', onFinishClick);
 
         showText();
     </script>

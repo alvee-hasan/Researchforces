@@ -1,0 +1,7 @@
+"response0 - john07 - Text","response0 - john07 - Option","response1 - akash098 - Text","response1 - akash098 - Option","response2 - hridoy - Text","response2 - hridoy - Option","response3 - hridoy - Text","response3 - hridoy - Option"
+"hello! How are you?",Kindness,"i don't want to see you",-,"i don't want to see you",Anger,"hello! How are you?",Kindness
+"Hey, can we hang out?",Kindness,"I dont want to talk to you",Anger,"Hey, can we hang out?",Kindness,"Hey, can we hang out?",Kindness
+"I am so angry right now!!",Anger,"That's so sweet of you",Kindness,"I dont want to talk to you",Anger,"I am so angry right now!!",Anger
+"i don't want to see you",-,"hello! How are you?",Kindness,"That's so sweet of you",Kindness,"i don't want to see you",Anger
+"I dont want to talk to you",-,"Hey, can we hang out?",-,"hello! How are you?",-,"I dont want to talk to you",Anger
+"That's so sweet of you",-,"I am so angry right now!!",Anger,"I am so angry right now!!",-,"That's so sweet of you",Kindness
