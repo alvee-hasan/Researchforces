@@ -45,6 +45,7 @@ $currentImageIndex = 0; // Initialize currentImageIndex
 ?>
 <!-- The rest of the HTML and JavaScript code remains unchanged -->
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -82,8 +83,7 @@ $currentImageIndex = 0; // Initialize currentImageIndex
         <label for="option2"><?php echo $option2; ?></label>
         <br>
         <button type="button" id="nextButton">Next</button>
-        <button type="button" id="skipButton">Skip</button>
-        <button type="button" id="finishButton">Finish Here</button> <!-- Finish Here Button -->
+        <button type="button" id="skipButton">Skip</button> <!-- Skip Button -->
     </form>
 
     <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
@@ -169,40 +169,11 @@ $currentImageIndex = 0; // Initialize currentImageIndex
             }
         }
 
-        function onFinishClick() {
-            // Loop through all remaining images
-            for (let i = currentImageIndex; i < imageFiles.length; i++) {
-                sendSkipRequest(imageFiles[i].imgid, imageFiles[i].name);
-            }
-            finishAnnotation(); // End the process after skipping all remaining images
-        }
-
-        function sendSkipRequest(imgId, imageName) {
-            const formData = new FormData();
-            formData.append('action', 'annotate');
-            formData.append('image_id', imgId); // Use imgid here
-            formData.append('options', '-'); // Default option for skip
-            formData.append('image_name', imageName); // Pass image name
-
-            fetch('process.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                console.log(data); // Check if "ok" is logged
-            })
-            .catch(error => {
-                console.error('Error sending data to PHP:', error);
-            });
-        }
-
         function finishAnnotation() {
             document.getElementById('imageContainer').style.display = 'none';
             document.getElementById('optionsForm').style.display = 'none';
             document.getElementById('nextButton').style.display = 'none';
             document.getElementById('skipButton').style.display = 'none';
-            document.getElementById('finishButton').style.display = 'none'; // Hide Finish Here button
             document.getElementById('final').style.display = 'block';
             alert('Your response has been recorded. Thanks a lot for collaboration.');
         }
@@ -216,7 +187,6 @@ $currentImageIndex = 0; // Initialize currentImageIndex
 
         document.getElementById('nextButton').addEventListener('click', onNextClick);
         document.getElementById('skipButton').addEventListener('click', onSkipClick);
-        document.getElementById('finishButton').addEventListener('click', onFinishClick); // Attach event to Finish Here button
 
         showImage();
     </script>
