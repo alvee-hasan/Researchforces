@@ -82,7 +82,16 @@ $currentAudioIndex = 0; // Initialize currentAudioIndex
     </form>
 
     <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
-    
+    <!--Added New-->
+    <?php 
+    @include 'config.php' ;
+    $resc = $resc + 1 ;
+    $sql = "UPDATE resource SET rescount='$resc' WHERE rid='$rid'" ;
+    mysqli_query($conn, $sql) ;
+    $qry = "UPDATE requests SET status='finished' WHERE rid='$rid' and username='$username'" ;
+    mysqli_query($conn, $qry) ;
+  ?>
+
     <script>
         const audioFiles = <?php echo json_encode($audioFiles); ?>;
         let currentAudioIndex = 0;

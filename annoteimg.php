@@ -88,6 +88,15 @@ $currentImageIndex = 0; // Initialize currentImageIndex
 
     <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
     
+    <?php 
+    @include 'config.php' ;
+    $resc = $resc + 1 ;
+    $sql = "UPDATE resource SET rescount='$resc' WHERE rid='$rid'" ;
+    mysqli_query($conn, $sql) ;
+    $qry = "UPDATE requests SET status='finished' WHERE rid='$rid' and username='$username'" ;
+    mysqli_query($conn, $qry) ;
+  ?>
+  
     <script>
         const imageFiles = <?php echo json_encode($imageFiles); ?>;
         let currentImageIndex = 0;
