@@ -3,6 +3,8 @@
 session_start();
 
 $username = "";
+$defaultdp = "img/profile1.png";  // Path to default DP
+
 if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
     $sql = "SELECT * FROM user WHERE username='$username'";
@@ -11,6 +13,10 @@ if (isset($_SESSION['username'])) {
         $row = mysqli_fetch_assoc($res);
         $image = "img/dp/" . $row['dp'];
         $pts = $row['point'];
+
+        if (!file_exists($image) || empty($row['dp'])) {
+            $image = $defaultdp;  // Use default DP
+        }
     }
 }
 
@@ -107,14 +113,18 @@ if (isset($_POST['submitBtn'])) {
 </head>
 
 <body>
-    <header>
-        <a href="index.php" class="noref">
-            <div class="refr"><span class="refrs">Research</span>Forces</div>
-        </a>
-        <div class="profile">
-            <img class="avatar" src="<?php echo $image; ?>">
-        </div>
-    </header>
+<header>
+    <a href="index.php" class="noref"><div class="refr"><span class="refrs">Research</span>Forces</div></a>
+
+    <div class="profile">
+        <img class="avatar" src="<?php echo $image; ?>">
+        <a href="profile.php" style="text-decoration:none;color:inherit;"><?php echo $username; ?></a>
+        <span> | </span>
+        <form action="" method="post" style="display:inline;">
+            <button type="submit" name='sectextbutton' style="background:none;border:none;color:inherit;padding:0;margin:0;cursor:pointer;font:inherit;"> <?php echo $sectext; ?> </button>
+        </form>
+    </div>
+</header>
 
     <div class="container">
         <nav class="menu">

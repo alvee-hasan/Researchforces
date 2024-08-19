@@ -12,7 +12,8 @@ $fullname = "" ;
 $email = "" ;
 $org = "" ;
 $interest = "" ;
-$defaultdp = "img/profile1.png";  // Path to default DP
+$defaultdp = "img/profile1.png";
+
 
 if(isset($_SESSION['username'])) {
     $username = $_SESSION['username'] ;
@@ -43,12 +44,11 @@ if($res) {
     $email = $row['email'] ;
     $org = $row['org'] ;
     $interest = $row['interest'] ;
-    $image = "img/dp/" . $row['dp'];
-
-    // Check if image exists or if no DP is provided
-    if (!file_exists($image) || empty($row['dp'])) {
-        $image = $defaultdp;  // Use default DP
+    if(!file_exists($image)){
+        $image = $defaultdp ;
     }
+    $image = "img/dp/" . $row['dp'] ;
+    
 }
 
 if (isset($_POST['submitBtn'])) {
@@ -83,6 +83,8 @@ $res1 = mysqli_query($conn, $qry) ;
 if($res1) {
     $creq = mysqli_num_rows($res1) ;
 }
+
+ 
 ?>
 
 <!DOCTYPE html>

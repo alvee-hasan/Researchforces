@@ -5,7 +5,6 @@ session_start() ;
 $username = "Sign In" ;
 $sectext = "Sign Up" ;
 $image = "img/icons8-person-64.png" ;
-$defaultdp = "img/profile1.png";  // Path to default DP
 
 if(isset($_SESSION['logusername'])) {
   $username = $_SESSION['logusername'] ;
@@ -15,10 +14,6 @@ if(isset($_SESSION['logusername'])) {
   if($res) {
     $row = mysqli_fetch_assoc($res);
       $image = "img/dp/" . $row['dp'] ;
-
-      if (!file_exists($image) || empty($row['dp'])) {
-        $image = $defaultdp;  // Use default DP
-    }
   }
   $sectext = "Log out" ;
 }

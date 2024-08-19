@@ -3,6 +3,8 @@
 session_start() ;
 
 $username = "" ;
+$defaultdp = "img/profile1.png";  // Path to default DP
+
 if(isset($_SESSION['username'])) {
     $username = $_SESSION['username'] ;
     $sql = "SELECT * FROM user WHERE username='$username'" ;
@@ -10,6 +12,10 @@ if(isset($_SESSION['username'])) {
     if($res) {
         $row = mysqli_fetch_assoc($res);
         $image = "img/dp/" . $row['dp'] ;
+
+        if (!file_exists($image) || empty($row['dp'])) {
+            $image = $defaultdp;  // Use default DP
+        }
     }
 } 
 
