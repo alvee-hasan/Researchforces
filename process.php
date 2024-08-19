@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             fclose($file);
         }
 
-        // Increment image count only if the option is not "-"
+        // Increment image count only if the option is not "-", For both Finish here and Skip
         if ($option !== "-") {
             $sql = "UPDATE imagecollection SET count = count + 1 WHERE imgid = ?";
             $stmt = $conn->prepare($sql);
