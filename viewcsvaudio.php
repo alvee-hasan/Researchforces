@@ -17,7 +17,7 @@ function readCSV($filename) {
     return $data;
 }
 
-// Function to merge the CSV files into one by columns with usernames on the top row
+// Function to merge the CSV files into one by columns with filenames and options
 function mergeCSVFiles() {
     global $conn;
     $dop = $_SESSION['dop'] ?? 0;
@@ -26,34 +26,52 @@ function mergeCSVFiles() {
     $folderPath = "AudioFiles/" . $dop;
     $outputFilePath = "AudioFiles/" . $dop . "/Final.csv";
     $mergedData = [];
+    $headers = [];
 
     // Get a list of CSV files in the folder
     $csvFiles = glob($folderPath . "/*.csv");
+
+    // Filter out 'data.csv'
+    $csvFiles = array_filter($csvFiles, function($file) {
+        return basename($file) !== 'data.csv';
+    });
 
     // Read data from each CSV file and store it in the mergedData array
     foreach ($csvFiles as $csvFile) {
         $csvData = readCSV($csvFile);
         $fileName = pathinfo($csvFile, PATHINFO_FILENAME);
         $username = explode('_', $fileName)[0]; // Extract username from file name
-        if (!isset($mergedData[$username])) {
-            $mergedData[$username] = ['file_names' => [], 'options' => []];
+        $responseName = implode('_', array_slice(explode('_', $fileName), 1)); // Response name
+
+        $headerFileName = $username . '_' . $responseName . '_File';
+        $headerOption = $username . '_' . $responseName . '_Option';
+
+        if (!isset($mergedData[$responseName])) {
+            $mergedData[$responseName] = ['file_names' => [], 'options' => []];
         }
+
         foreach ($csvData as $row) {
-            $mergedData[$username]['file_names'][] = $row[0];
-            $mergedData[$username]['options'][] = $row[1];
+            if (isset($row[0]) && isset($row[1])) {
+                $mergedData[$responseName]['file_names'][] = $row[0];
+                $mergedData[$responseName]['options'][] = $row[1];
+            }
+        }
+
+        // Add headers for this response file
+        if (!in_array($headerFileName, $headers)) {
+            $headers[] = $headerFileName;
+            $headers[] = $headerOption;
         }
     }
 
     // Write the data to the new merged CSV file with column headings
     $fileHandle = fopen($outputFilePath, 'w');
-
-    // Write the top row with usernames
-    $header = [];
-    foreach (array_keys($mergedData) as $username) {
-        $header[] = $username . ' - File Name';
-        $header[] = $username . ' - Option';
+    if ($fileHandle === false) {
+        die('Failed to open file for writing.');
     }
-    fputcsv($fileHandle, $header);
+
+    // Write the top row with headers
+    fputcsv($fileHandle, $headers);
 
     // Determine the maximum number of rows in any column
     $maxRows = 0;
@@ -63,9 +81,16 @@ function mergeCSVFiles() {
 
     for ($i = 0; $i < $maxRows; $i++) {
         $rowData = [];
-        foreach (array_keys($mergedData) as $username) {
-            $rowData[] = $mergedData[$username]['file_names'][$i] ?? '';
-            $rowData[] = $mergedData[$username]['options'][$i] ?? '-';
+        foreach ($headers as $header) {
+            // Extract response name from the header
+            $responseName = implode('_', array_slice(explode('_', $header), 1, -1));
+            $isFileColumn = strpos($header, 'File') !== false;
+
+            if ($isFileColumn) {
+                $rowData[] = $mergedData[$responseName]['file_names'][$i] ?? '';
+            } else {
+                $rowData[] = $mergedData[$responseName]['options'][$i] ?? '-';
+            }
         }
         fputcsv($fileHandle, $rowData);
     }
@@ -132,7 +157,9 @@ if (isset($_POST['merge'])) {
     if (count($csvFiles) > 0) {
         echo '<ul>';
         foreach ($csvFiles as $csvFile) {
-            echo '<li><a href="csvview.php?file=' . urlencode($csvFile) . '" target="_blank">' . basename($csvFile) . '</a></li>';
+            if (basename($csvFile) !== 'data.csv') {
+                echo '<li><a href="csvview.php?file=' . urlencode($csvFile) . '" target="_blank">' . basename($csvFile) . '</a></li>';
+            }
         }
         echo '</ul>';
     } else {

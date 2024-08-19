@@ -79,6 +79,7 @@ $currentAudioIndex = 0; // Initialize currentAudioIndex
         <br>
         <button type="button" id="nextButton">Next</button>
         <button type="button" id="skipButton">Skip</button> <!-- Skip Button -->
+        <button type="button" id="finishButton">Finish Here</button> <!-- Finish Here Button -->
     </form>
 
     <p id='final'>Thanks a lot for collaboration. You have earned 20 points. <br>Go to <a href='index.php'>Home</a></p>
@@ -90,7 +91,7 @@ $currentAudioIndex = 0; // Initialize currentAudioIndex
     mysqli_query($conn, $sql) ;
     $qry = "UPDATE requests SET status='finished' WHERE rid='$rid' and username='$username'" ;
     mysqli_query($conn, $qry) ;
-  ?>
+    ?>
 
     <script>
         const audioFiles = <?php echo json_encode($audioFiles); ?>;
@@ -166,11 +167,18 @@ $currentAudioIndex = 0; // Initialize currentAudioIndex
             }
         }
 
+        function onFinishClick() {
+            while (currentAudioIndex < audioFiles.length) {
+                onSkipClick(); // Automatically skip the rest of the files
+            }
+        }
+
         function finishAnnotation() {
             document.getElementById('audioContainer').style.display = 'none';
             document.getElementById('optionsForm').style.display = 'none';
             document.getElementById('nextButton').style.display = 'none';
             document.getElementById('skipButton').style.display = 'none';
+            document.getElementById('finishButton').style.display = 'none';
             document.getElementById('final').style.display = 'block';
             alert('Your response has been recorded. Thanks a lot for collaboration.');
         }
@@ -184,6 +192,7 @@ $currentAudioIndex = 0; // Initialize currentAudioIndex
 
         document.getElementById('nextButton').addEventListener('click', onNextClick);
         document.getElementById('skipButton').addEventListener('click', onSkipClick);
+        document.getElementById('finishButton').addEventListener('click', onFinishClick);
 
         showAudio();
     </script>
