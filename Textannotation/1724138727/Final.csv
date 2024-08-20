@@ -1,0 +1,27 @@
+"response0 - alvee1 - Text","response0 - alvee1 - Option","response1 - hridoy - Text","response1 - hridoy - Option","response2 - john07 - Text","response2 - john07 - Option","response3 - alvee1 - Text","response3 - alvee1 - Option"
+A,Sad,L,Sad,V,Sad,A,Sad
+B,Happy,M,Sad,W,Happy,B,Happy
+C,Sad,N,Happy,A,-,C,Sad
+D,Sad,O,Happy,C,-,D,Happy
+E,Sad,P,Happy,G,-,E,Sad
+F,Happy,Q,Sad,B,-,F,Sad
+G,Happy,R,Sad,E,-,G,Happy
+H,Sad,S,Sad,D,-,H,Happy
+I,Sad,T,Sad,F,-,I,Happy
+J,Happy,U,Happy,H,-,J,Sad
+K,Happy,V,-,I,-,K,Happy
+L,-,W,-,J,-,L,Happy
+M,-,X,Happy,K,-,M,Sad
+P,-,Y,Sad,L,-,N,Sad
+N,-,Z,Happy,M,-,O,Sad
+Q,-,A,-,N,-,P,Happy
+R,-,B,-,O,-,Q,Happy
+O,-,C,-,P,-,R,Sad
+S,-,D,-,Q,-,S,Sad
+T,-,F,-,R,-,T,Happy
+U,-,E,-,S,-,U,Happy
+W,-,G,-,T,-,V,Sad
+V,-,H,-,U,-,W,Happy
+X,-,I,-,X,-,X,Happy
+Y,-,J,-,Y,-,Y,Sad
+Z,-,K,-,Z,-,Z,Happy
